@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "serverless-appsync-plugin": "^1.11.3",
+    "serverless-pseudo-parameters": "^2.5.0"
+  },
+  "name": "online-course",
+  "version": "1.0.0",
+  "main": "handler.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

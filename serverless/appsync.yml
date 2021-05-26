@@ -1,0 +1,24 @@
+name: online-course
+# apiKey # only required for update-appsync/delete-appsync
+# apiId # if provided, will update the specified API.
+authenticationType: AMAZON_COGNITO_USER_POOLS
+additionalAuthenticationProviders:
+  - authenticationType: API_KEY
+apiKeys:
+  - name: signup
+    description: "Key for signup"
+schema: "schema.graphql"
+# Caching options. Disabled by default
+# read more at https://aws.amazon.com/blogs/mobile/appsync-caching-transactions/
+# and https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-appsync-apicache.html
+userPoolConfig:
+  defaultAction: ALLOW
+  userPoolId: ${self:custom.userPoolId}
+
+dataSources:
+  - type: AMAZON_DYNAMODB
+    name: dynamoDb_online_course
+    description: "One BH Table"
+    config:
+      tableName: "buildOpsOne"
+      serviceRoleArn: "arn:aws:iam::#{AWS::AccountId}:role/Dynamo-OnlineCourse"

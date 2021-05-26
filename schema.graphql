@@ -1,0 +1,50 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  getUsers: [User]
+}
+type Mutation {
+  postUser: [User]
+}
+
+interface _baseEntity @aws_cognito_user_pools {
+  id: String
+  entityType: String
+  createdBy: String
+  createdDate: Int
+  lastUpdatedBy: String
+  lastUpdatedDate: Int
+  lsi1: String
+  lsi2: String
+  lsi3: String
+  lsi4: String
+  lsi5: String
+  gsi1: String
+  gsi2: String
+}
+
+enum USER_TYPE {
+  TUTOR
+  STUDENT
+}
+
+type User implements _baseEntity @aws_cognito_user_pools {
+  id: String
+  entityType: String
+  name: String
+  userType: USER_TYPE
+  createdBy: String
+  createdDate: Int
+  lastUpdatedBy: String
+  lastUpdatedDate: Int
+  lsi1: String
+  lsi2: String
+  lsi3: String
+  lsi4: String
+  lsi5: String
+  gsi1: String
+  gsi2: String
+}

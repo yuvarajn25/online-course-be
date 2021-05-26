@@ -1,0 +1,81 @@
+CognitoUserPool:
+  Type: "AWS::Cognito::UserPool"
+  Properties:
+    MfaConfiguration: OFF
+    UserPoolName: online-course
+    UsernameAttributes:
+      - email
+    Policies:
+      PasswordPolicy:
+        MinimumLength: 6
+        RequireLowercase: False
+        RequireNumbers: False
+        RequireSymbols: False
+        RequireUppercase: False
+CognitoUserPoolClient:
+  Type: "AWS::Cognito::UserPoolClient"
+  Properties:
+    ClientName: my-user-pool-client
+    GenerateSecret: False
+    UserPoolId:
+      Ref: CognitoUserPool
+CognitoUserTutor:
+  Type: AWS::Cognito::UserPoolGroup
+  Properties:
+    Description: "Tutor login group"
+    GroupName: "Tutor"
+    UserPoolId:
+      Ref: CognitoUserPool
+CognitoUserStudent:
+  Type: AWS::Cognito::UserPoolGroup
+  Properties:
+    Description: "Student login group"
+    GroupName: "Student"
+    UserPoolId:
+      Ref: CognitoUserPool
+DynamoTable:
+  Type: "AWS::DynamoDB::Table"
+  Properties:
+    TableName: "onlineCourse"
+    KeySchema:
+      - AttributeName: entityType
+        KeyType: HASH
+      - AttributeName: id
+        KeyType: RANGE
+    AttributeDefinitions:
+      - AttributeName: entityType
+        AttributeType: S
+      - AttributeName: id
+        AttributeType: S
+    ProvisionedThroughput:
+      ReadCapacityUnits: 5
+      WriteCapacityUnits: 5
+
+AppSyncDynamoServiceRole:
+  Type: "AWS::IAM::Role"
+  Properties:
+    RoleName: "Dynamo-OnlineCourse"
+    AssumeRolePolicyDocument:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: "Allow"
+          Principal:
+            Service:
+              - "appsync.amazonaws.com"
+          Action:
+            - "sts:AssumeRole"
+    Policies:
+      - PolicyName: "Dynamo-OnlineCourse-Policy"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Action:
+                - "dynamodb:*"
+              Resource:
+                - "Fn::Join":
+                    - ":"
+                    - - "arn:aws:dynamodb"
+                      - ${self:provider.region}
+                      - ${self:custom.accountId}
+                      - "table/*"
