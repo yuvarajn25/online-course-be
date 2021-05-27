@@ -2,6 +2,8 @@ CognitoUserPool:
   Type: "AWS::Cognito::UserPool"
   Properties:
     MfaConfiguration: OFF
+    AutoVerifiedAttributes:
+      - email
     UserPoolName: online-course
     UsernameAttributes:
       - email
@@ -15,10 +17,21 @@ CognitoUserPool:
 CognitoUserPoolClient:
   Type: "AWS::Cognito::UserPoolClient"
   Properties:
-    ClientName: my-user-pool-client
+    ClientName: online-course-client
     GenerateSecret: False
     UserPoolId:
       Ref: CognitoUserPool
+IdentityPool:
+  Type: "AWS::Cognito::IdentityPool"
+  Properties:
+    IdentityPoolName: online-course-identity
+    AllowUnauthenticatedIdentities: false
+    CognitoIdentityProviders:
+      - ClientId:
+          Ref: CognitoUserPoolClient
+        ProviderName:
+          "Fn::GetAtt": [CognitoUserPool, ProviderName]
+
 CognitoUserTutor:
   Type: AWS::Cognito::UserPoolGroup
   Properties:

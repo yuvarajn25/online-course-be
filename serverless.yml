@@ -17,6 +17,7 @@ provider:
     ACCOUNT_ID: ${self:custom.accountId}
     USER_POOL_ID: ${self:custom.userPoolId}
     USER_POOL_CLIENT_ID: ${self:custom.userPoolClientId}
+  iamRoleStatements: ${file(serverless/iamRoleStatements.yml):iamRoleStatements}
 # you can overwrite defaults here
 #  stage: dev
 #  region: us-east-1
@@ -52,9 +53,24 @@ provider:
 plugins:
   - serverless-appsync-plugin
   - serverless-pseudo-parameters
+  - serverless-webpack
 functions:
   hello:
     handler: handler.hello
+  customMessage:
+    handler: lambdas/customMessage.handler
+    events:
+      - cognitoUserPool:
+          pool: online-course
+          trigger: CustomMessage
+          existing: true
+  postAuthentication:
+    handler: lambdas/postAuthentication.handler
+    events:
+      - cognitoUserPool:
+          pool: online-course
+          trigger: PostAuthentication
+          existing: true
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -113,3 +129,7 @@ custom:
   userPoolId: !Ref CognitoUserPool
   userPoolClientId: !Ref CognitoUserPoolClient
   appSync: ${file(serverless/appsync.yml)}
+  webpack:
+    webpackConfig: "webpack.config.js" # Name of webpack configuration file
+    includeModules: true # Node modules configuration for packaging
+    packager: "yarn" # Packager that will be used to package your external modules

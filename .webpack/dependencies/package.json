@@ -1,0 +1,10 @@
+{
+  "name": "online-course",
+  "version": "1.0.0",
+  "description": "Packaged externals for online-course",
+  "private": true,
+  "scripts": {},
+  "dependencies": {
+    "aws-sdk": "^2.916.0"
+  }
+}
