@@ -4,8 +4,10 @@
     "babel-core": "^6.26.3",
     "babel-loader": "^8.2.2",
     "babel-preset-env": "^1.7.0",
+    "moment": "^2.29.1",
     "serverless-appsync-plugin": "^1.11.3",
-    "serverless-pseudo-parameters": "^2.5.0"
+    "serverless-pseudo-parameters": "^2.5.0",
+    "uuid": "^8.3.2"
   },
   "name": "online-course",
   "version": "1.0.0",

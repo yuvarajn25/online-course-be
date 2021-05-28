@@ -71,6 +71,11 @@ functions:
           pool: online-course
           trigger: PostAuthentication
           existing: true
+  mutations:
+    handler: lambdas/mutations.handler
+    timeout: 300
+    memorySize: 1536
+    runtime: nodejs12.x
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

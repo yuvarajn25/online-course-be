@@ -60,9 +60,36 @@ DynamoTable:
         AttributeType: S
       - AttributeName: id
         AttributeType: S
+      - AttributeName: gsi1
+        AttributeType: S
+      - AttributeName: gsi2
+        AttributeType: S
     ProvisionedThroughput:
       ReadCapacityUnits: 5
       WriteCapacityUnits: 5
+    GlobalSecondaryIndexes:
+      - IndexName: entity-gsi1-index
+        KeySchema:
+          - AttributeName: entityType
+            KeyType: HASH
+          - AttributeName: gsi1
+            KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+      - IndexName: entity-gsi2-index
+        KeySchema:
+          - AttributeName: entityType
+            KeyType: HASH
+          - AttributeName: gsi2
+            KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
 
 AppSyncDynamoServiceRole:
   Type: "AWS::IAM::Role"
@@ -92,3 +119,31 @@ AppSyncDynamoServiceRole:
                       - ${self:provider.region}
                       - ${self:custom.accountId}
                       - "table/*"
+AppSyncLambdaServiceRole:
+  Type: "AWS::IAM::Role"
+  Properties:
+    RoleName: "Lambda-OnlineCourse"
+    AssumeRolePolicyDocument:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: "Allow"
+          Principal:
+            Service:
+              - "appsync.amazonaws.com"
+          Action:
+            - "sts:AssumeRole"
+    Policies:
+      - PolicyName: "Lambda-OnlineCourse-Policy"
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: "Allow"
+              Action:
+                - "lambda:invokeFunction"
+              Resource:
+                - "Fn::Join":
+                    - ":"
+                    - - "arn:aws:lambda"
+                      - ${self:provider.region}
+                      - ${self:custom.accountId}
+                      - "function:*"

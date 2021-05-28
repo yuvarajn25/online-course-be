@@ -3,25 +3,13 @@ schema {
   mutation: Mutation
 }
 
-type Query {
-  getUsers: [User]
-}
-type Mutation {
-  postUser: [User]
-}
-
-interface _baseEntity @aws_cognito_user_pools {
+interface _baseEntity {
   id: String
   entityType: String
   createdBy: String
   createdDate: Int
   lastUpdatedBy: String
   lastUpdatedDate: Int
-  lsi1: String
-  lsi2: String
-  lsi3: String
-  lsi4: String
-  lsi5: String
   gsi1: String
   gsi2: String
 }
@@ -40,11 +28,131 @@ type User implements _baseEntity @aws_cognito_user_pools {
   createdDate: Int
   lastUpdatedBy: String
   lastUpdatedDate: Int
-  lsi1: String
-  lsi2: String
-  lsi3: String
-  lsi4: String
-  lsi5: String
   gsi1: String
   gsi2: String
+  courses: [Course]
+  courseSubscriptions: [CourseSubscription]
+}
+
+type Course implements _baseEntity @aws_cognito_user_pools {
+  id: String
+  entityType: String
+  name: String
+  description: String
+  authorId: String
+  author: User
+  createdBy: String
+  createdDate: Int
+  lastUpdatedBy: String
+  lastUpdatedDate: Int
+  gsi1: String # Parent id. User is the parent of course
+  gsi2: String
+  comments: [Comment]
+  courseVideos: [CourseVideo]
+  courseSubscriptions: [CourseSubscription]
+  ratings: [Rating]
+}
+
+type CourseVideo implements _baseEntity @aws_cognito_user_pools {
+  id: String
+  entityType: String
+  name: String
+  description: String
+  videoUrl: String
+  courseId: String
+  course: Course
+  createdBy: String
+  createdDate: Int
+  lastUpdatedBy: String
+  lastUpdatedDate: Int
+  gsi1: String # Parent id. Course is the parent of CourseVideo
+  gsi2: String
+}
+
+type CourseSubscription implements _baseEntity @aws_cognito_user_pools {
+  id: String
+  entityType: String
+  courseId: String
+  userId: String
+  course: Course
+  user: User
+  createdBy: String
+  createdDate: Int
+  lastUpdatedBy: String
+  lastUpdatedDate: Int
+  gsi1: String # Parent id. User is the parent of CourseSubscription
+  gsi2: String # Course ID. list the data course
+}
+
+type Comment implements _baseEntity @aws_cognito_user_pools {
+  id: String
+  entityType: String
+  comment: String
+  parentId: String # Parent id. will be the course and for reply this will be the comment id
+  parent: _baseEntity
+  userId: String
+  user: User
+  createdBy: String
+  createdDate: Int
+  lastUpdatedBy: String
+  lastUpdatedDate: Int
+  gsi1: String # Parent id. will be the course and for reply this will be the comment id
+  gsi2: String
+}
+
+type Rating implements _baseEntity @aws_cognito_user_pools {
+  id: String
+  entityType: String
+  rating: Float
+  courseId: String
+  course: User
+  userId: String
+  user: User
+  createdBy: String
+  createdDate: Int
+  lastUpdatedBy: String
+  lastUpdatedDate: Int
+  gsi1: String # Parent id. will be the couse id
+  gsi2: String
+}
+
+input CourseInput {
+  id: String
+  entityType: String
+  name: String
+  description: String
+  authorId: String
+}
+
+input CourseVideoInput {
+  id: String
+  entityType: String
+  name: String
+  description: String
+  videoUrl: String
+  courseId: String
+}
+
+type Query {
+  getCoursesByAuthor: [Course]
+  getCourses: [Course]
+
+  getCourseVideosByCourse(courseId: String): [CourseVideo]
+  getSubscriptions: [CourseSubscription]
+  getCommentsByParent(parentId: String): [Comment]
+}
+type Mutation {
+  createCourse(course: CourseInput!): Course
+  updateCourse(course: CourseInput!, id: String!): Course
+  deleteCourse(id: String!): Course
+
+  createCourseVideo(course: CourseInput!): Course
+  updateCourseVideo(course: CourseInput!, id: String!): Course
+  deleteCourseVideo(id: String!): Course
+
+  subscribeCourse(courseId: String!): Course
+
+  addRating(courseId: String, rating: Float): Rating
+
+  addComments(parentId: String, comment: String): Comment
 }
