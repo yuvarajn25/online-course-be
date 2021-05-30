@@ -1,0 +1,13 @@
+
+{
+    "version": "2017-02-28",
+    "operation" : "Query",
+    "index" : "entity-gsi1-index",
+    "query" : {
+        ## Provide a query expression. **
+        "expression": "entityType = :entityType",
+        "expressionValues" : {
+            ":entityType" : $util.dynamodb.toDynamoDBJson($context.args.entityType)
+        }
+    }
+}

@@ -14,7 +14,7 @@ interface _baseEntity {
   gsi2: String
 }
 
-enum USER_TYPE {
+enum ROLE {
   TUTOR
   STUDENT
 }
@@ -23,7 +23,7 @@ type User implements _baseEntity @aws_cognito_user_pools {
   id: String
   entityType: String
   name: String
-  userType: USER_TYPE
+  role: ROLE
   createdBy: String
   createdDate: Int
   lastUpdatedBy: String
@@ -31,7 +31,7 @@ type User implements _baseEntity @aws_cognito_user_pools {
   gsi1: String
   gsi2: String
   courses: [Course]
-  courseSubscriptions: [CourseSubscription]
+  courseSubscriptions(entityType: String): [CourseSubscription]
 }
 
 type Course implements _baseEntity @aws_cognito_user_pools {
@@ -47,10 +47,10 @@ type Course implements _baseEntity @aws_cognito_user_pools {
   lastUpdatedDate: Int
   gsi1: String # Parent id. User is the parent of course
   gsi2: String
-  comments: [Comment]
-  courseVideos: [CourseVideo]
-  courseSubscriptions: [CourseSubscription]
-  ratings: [Rating]
+  comments(entityType: String): [Comment]
+  courseVideos(entityType: String): [CourseVideo]
+  courseSubscriptions(entityType: String): [CourseSubscription]
+  ratings(entityType: String): [Rating]
 }
 
 type CourseVideo implements _baseEntity @aws_cognito_user_pools {
@@ -92,6 +92,7 @@ type Comment implements _baseEntity @aws_cognito_user_pools {
   parent: _baseEntity
   userId: String
   user: User
+  comments(entityType: String): [Comment]
   createdBy: String
   createdDate: Int
   lastUpdatedBy: String
@@ -112,7 +113,7 @@ type Rating implements _baseEntity @aws_cognito_user_pools {
   createdDate: Int
   lastUpdatedBy: String
   lastUpdatedDate: Int
-  gsi1: String # Parent id. will be the couse id
+  gsi1: String # Parent id. will be the course id
   gsi2: String
 }
 
@@ -134,23 +135,20 @@ input CourseVideoInput {
 }
 
 type Query {
-  getCoursesByAuthor: [Course]
-  getCourses: [Course]
+  getCoursesByAuthor(entityType: String, id: String): [Course]
+  getCourses(entityType: String): [Course]
+  getCoursesById(entityType: String, id: String): Course
 
-  getCourseVideosByCourse(courseId: String): [CourseVideo]
-  getSubscriptions: [CourseSubscription]
-  getCommentsByParent(parentId: String): [Comment]
+  getUserById(entityType: String, id: String): User
 }
 type Mutation {
   createCourse(course: CourseInput!): Course
-  updateCourse(course: CourseInput!, id: String!): Course
   deleteCourse(id: String!): Course
 
-  createCourseVideo(course: CourseInput!): Course
-  updateCourseVideo(course: CourseInput!, id: String!): Course
-  deleteCourseVideo(id: String!): Course
+  createCourseVideo(courseVideo: CourseVideoInput!): CourseVideo
+  deleteCourseVideo(id: String!): CourseVideo
 
-  subscribeCourse(courseId: String!): Course
+  subscribeCourse(courseId: String!): CourseSubscription
 
   addRating(courseId: String, rating: Float): Rating
 

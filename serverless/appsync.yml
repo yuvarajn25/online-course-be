@@ -20,7 +20,7 @@ dataSources:
     name: dynamoDb_online_course
     description: "One BH Table"
     config:
-      tableName: "buildOpsOne"
+      tableName: "onlineCourse"
       serviceRoleArn: "arn:aws:iam::#{AWS::AccountId}:role/Dynamo-OnlineCourse"
   - type: AWS_LAMBDA
     name: mutations_lambda
@@ -34,3 +34,73 @@ mappingTemplates:
     field: createCourse
     request: "Generic_Mutation.request.vtl"
     response: "Generic_Mutation.response.vtl"
+  - dataSource: mutations_lambda
+    type: Mutation
+    field: createCourseVideo
+    request: "Generic_Mutation.request.vtl"
+    response: "Generic_Mutation.response.vtl"
+  - dataSource: mutations_lambda
+    type: Mutation
+    field: subscribeCourse
+    request: "Generic_Mutation.request.vtl"
+    response: "Generic_Mutation.response.vtl"
+  - dataSource: mutations_lambda
+    type: Mutation
+    field: addComments
+    request: "Generic_Mutation.request.vtl"
+    response: "Generic_Mutation.response.vtl"
+  - dataSource: dynamoDb_online_course
+    type: Query
+    field: getCoursesByAuthor
+    request: "Get_Entities_By_Parent.request.vtl"
+    response: "Get_Entities_By_Parent.response.vtl"
+  - dataSource: dynamoDb_online_course
+    type: Query
+    field: getCoursesById
+    request: "Get_Entities_By_Id.request.vtl"
+    response: "Get_Entities_By_Id.response.vtl"
+  - dataSource: dynamoDb_online_course
+    type: Course
+    field: courseVideos
+    request: "Get_Entities_By_Parent.request.vtl"
+    response: "Get_Entities_By_Parent.response.vtl"
+  - dataSource: dynamoDb_online_course
+    type: Query
+    field: getCourseVideosByCourse
+    request: "Get_Entities_By_Parent.request.vtl"
+    response: "Get_Entities_By_Parent.response.vtl"
+  - dataSource: dynamoDb_online_course
+    type: Query
+    field: getSubscriptions
+    request: "Get_Entities_By_Parent.request.vtl"
+    response: "Get_Entities_By_Parent.response.vtl"
+  - dataSource: dynamoDb_online_course
+    type: Query
+    field: getCommentsByParent
+    request: "Get_Entities_By_Parent.request.vtl"
+    response: "Get_Entities_By_Parent.response.vtl"
+  - dataSource: dynamoDb_online_course
+    type: Query
+    field: getCourses
+    request: "Get_All_Entities.request.vtl"
+    response: "Get_All_Entities.response.vtl"
+  - dataSource: dynamoDb_online_course
+    type: Query
+    field: getUserById
+    request: "Get_Entities_By_Id.request.vtl"
+    response: "Get_Entities_By_Id.response.vtl"
+  - dataSource: dynamoDb_online_course
+    type: User
+    field: courseSubscriptions
+    request: "Get_Entities_By_Parent.request.vtl"
+    response: "Get_Entities_By_Parent.response.vtl"
+  - dataSource: dynamoDb_online_course
+    type: Course
+    field: comments
+    request: "Get_Entities_By_Parent.request.vtl"
+    response: "Get_Entities_By_Parent.response.vtl"
+  - dataSource: dynamoDb_online_course
+    type: Comment
+    field: comments
+    request: "Get_Entities_By_Parent.request.vtl"
+    response: "Get_Entities_By_Parent.response.vtl"

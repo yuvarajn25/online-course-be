@@ -14,6 +14,9 @@ CognitoUserPool:
         RequireNumbers: False
         RequireSymbols: False
         RequireUppercase: False
+    Schema:
+      - AttributeDataType: String
+        Name: "role"
 CognitoUserPoolClient:
   Type: "AWS::Cognito::UserPoolClient"
   Properties:
@@ -21,6 +24,7 @@ CognitoUserPoolClient:
     GenerateSecret: False
     UserPoolId:
       Ref: CognitoUserPool
+
 IdentityPool:
   Type: "AWS::Cognito::IdentityPool"
   Properties:
@@ -31,7 +35,31 @@ IdentityPool:
           Ref: CognitoUserPoolClient
         ProviderName:
           "Fn::GetAtt": [CognitoUserPool, ProviderName]
-
+AuthenticationTrust:
+  Type: "AWS::IAM::Role"
+  Properties:
+    RoleName: "AuthenticationTrust"
+    AssumeRolePolicyDocument:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: "Allow"
+          Principal:
+            Federated:
+              - "cognito-identity.amazonaws.com"
+          Action: "sts:AssumeRoleWithWebIdentity"
+          Condition:
+            StringEquals:
+              cognito-identity.amazonaws.com:aud:
+                - !Ref IdentityPool
+            ForAnyValue:StringLike:
+              cognito-identity.amazonaws.com:amr:
+                - authenticated
+IdentityPoolRoleAttachment:
+  Type: AWS::Cognito::IdentityPoolRoleAttachment
+  Properties:
+    IdentityPoolId: !Ref IdentityPool
+    Roles:
+      "authenticated": !GetAtt AuthenticationTrust.Arn
 CognitoUserTutor:
   Type: AWS::Cognito::UserPoolGroup
   Properties:
@@ -67,6 +95,8 @@ DynamoTable:
     ProvisionedThroughput:
       ReadCapacityUnits: 5
       WriteCapacityUnits: 5
+    StreamSpecification:
+      StreamViewType: "NEW_IMAGE"
     GlobalSecondaryIndexes:
       - IndexName: entity-gsi1-index
         KeySchema:
@@ -147,3 +177,82 @@ AppSyncLambdaServiceRole:
                       - ${self:provider.region}
                       - ${self:custom.accountId}
                       - "function:*"
+S3Bucket:
+  Type: AWS::S3::Bucket
+  Properties:
+    BucketName: "online-course-content"
+    CorsConfiguration:
+      CorsRules:
+        - AllowedHeaders:
+            - "*"
+          AllowedMethods:
+            - HEAD
+            - GET
+            - POST
+            - PUT
+            - DELETE
+          AllowedOrigins:
+            - "*"
+          ExposedHeaders:
+            - Date
+            - ETag
+          Id: myCORSRuleId1
+          MaxAge: 3600
+S3BucketPolicy:
+  Type: "AWS::S3::BucketPolicy"
+  Properties:
+    Bucket: !Ref S3Bucket
+    PolicyDocument:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: Allow
+          Principal: "*"
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
+          Resource:
+            - arn:aws:s3:::online-course-content/public/*
+            - !Join [
+                "",
+                [
+                  "arn:aws:s3:::online-course-content/protected/",
+                  "$",
+                  "{cognito-identity.amazonaws.com:sub}/*",
+                ],
+              ]
+            - !Join [
+                "",
+                [
+                  "arn:aws:s3:::online-course-content/private/",
+                  "$",
+                  "{cognito-identity.amazonaws.com:sub}/*",
+                ],
+              ]
+        - Effect: Allow
+          Principal: "*"
+          Action: s3:PutObject
+          Resource: arn:aws:s3:::online-course-content/uploads/*
+        - Effect: Allow
+          Principal: "*"
+          Action: s3:GetObject
+          Resource: arn:aws:s3:::online-course-content/protected/*
+        - Effect: Allow
+          Principal: "*"
+          Action: s3:ListBucket
+          Resource: arn:aws:s3:::online-course-content
+          Condition:
+            StringLike:
+              s3:prefix:
+                - public/
+                - public/*
+                - protected/
+                - protected/*
+                - !Join [
+                    "",
+                    ["private/", "$", "{cognito-identity.amazonaws.com:sub}/"],
+                  ]
+                - !Join [
+                    "",
+                    ["private/", "$", "{cognito-identity.amazonaws.com:sub}/*"],
+                  ]

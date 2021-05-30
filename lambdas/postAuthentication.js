@@ -11,11 +11,20 @@ module.exports.handler = async (event, context, callback) => {
   const isExists = await dynamoDBHelper.getEntityById(ENTITY_TYPES.USER, id);
   console.log(`isExists`, isExists);
   if (!isExists) {
+    const userAttributes = Object.keys(event.request.userAttributes).reduce(
+      (a, b) => {
+        return {
+          ...a,
+          [b.replace("custom:", "")]: event.request.userAttributes[b],
+        };
+      },
+      {}
+    );
     await dynamoDBHelper.batchWrite([
       {
         id,
         entityType: ENTITY_TYPES.USER,
-        ...event.request.userAttributes,
+        ...userAttributes,
       },
     ]);
   }

@@ -7,12 +7,13 @@ export default class DynamoDBHelper {
   }
 
   async getEntityById(entityType, id) {
+    if (!id) return null;
     const params = {
       TableName: this.tableName,
       Key: { entityType, id },
     };
     const item = await this.dynamodb.get(params).promise();
-    return item && Object.keys(item).length > 0 && item;
+    return item && Object.keys(item).length > 0 && item.Item;
   }
 
   async batchWrite(items) {

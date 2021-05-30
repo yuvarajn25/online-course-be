@@ -1,0 +1,20 @@
+
+#if( $util.isNull($context.source.id))
+    #set($id = $context.args.id)
+#else
+    #set($id = $context.source.id)
+#end
+
+{
+    "version": "2017-02-28",
+    "operation" : "Query",
+    "index" : "entity-gsi1-index",
+    "query" : {
+        ## Provide a query expression. **
+        "expression": "entityType = :entityType AND gsi1= :gsi1",
+        "expressionValues" : {
+            ":entityType" : $util.dynamodb.toDynamoDBJson($context.args.entityType),
+            ":gsi1" : $util.dynamodb.toDynamoDBJson($id)
+        }
+    }
+}

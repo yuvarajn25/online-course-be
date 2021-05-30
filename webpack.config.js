@@ -12,6 +12,14 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.template$/,
+        use: [
+          {
+            loader: "buffer-loader",
+          },
+        ],
+      },
+      {
         test: /\.js$/,
         use: [
           {
