@@ -50,7 +50,6 @@ type Course implements _baseEntity @aws_cognito_user_pools {
   comments(entityType: String): [Comment]
   courseVideos(entityType: String): [CourseVideo]
   courseSubscriptions(entityType: String): [CourseSubscription]
-  ratings(entityType: String): [Rating]
 }
 
 type CourseVideo implements _baseEntity @aws_cognito_user_pools {
@@ -101,22 +100,6 @@ type Comment implements _baseEntity @aws_cognito_user_pools {
   gsi2: String
 }
 
-type Rating implements _baseEntity @aws_cognito_user_pools {
-  id: String
-  entityType: String
-  rating: Float
-  courseId: String
-  course: User
-  userId: String
-  user: User
-  createdBy: String
-  createdDate: Int
-  lastUpdatedBy: String
-  lastUpdatedDate: Int
-  gsi1: String # Parent id. will be the course id
-  gsi2: String
-}
-
 input CourseInput {
   id: String
   entityType: String
@@ -149,8 +132,6 @@ type Mutation {
   deleteCourseVideo(id: String!): CourseVideo
 
   subscribeCourse(courseId: String!): CourseSubscription
-
-  addRating(courseId: String, rating: Float): Rating
 
   addComments(parentId: String, comment: String): Comment
 }

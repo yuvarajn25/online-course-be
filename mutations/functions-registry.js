@@ -3,6 +3,8 @@ const {
   addCourseVideo,
   subscribeCourse,
   addComment,
+  deleteCourse,
+  deleteCourseVideo,
 } = require("./functions/course");
 
 module.exports = [
@@ -21,5 +23,13 @@ module.exports = [
   {
     name: "addComments",
     mutationHandler: addComment,
+  },
+  {
+    name: "deleteCourse",
+    mutationHandler: deleteCourse,
+  },
+  {
+    name: "deleteCourseVideo",
+    mutationHandler: deleteCourseVideo,
   },
 ];

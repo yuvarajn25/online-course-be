@@ -4,6 +4,8 @@ exports.ENTITY_TYPES = {
   USER: "User",
   COURSE: "Course",
   COURSE_SUBSCRIPTION: "CourseSubscription",
+  COURSE_VIDEO: "CourseVideo",
+  COMMENT: "Comment",
 };
 
 exports.OPERATION = {
